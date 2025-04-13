@@ -1,0 +1,2 @@
+ALTER TABLE Orders
+ADD COLUMN return_reason TEXT DEFAULT NULL; 
