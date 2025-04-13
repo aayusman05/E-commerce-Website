@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12 text-center">
+        <h1>Welcome to ShopSmart</h1>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">Customers</h5>
+                <p class="card-text">Manage customer information and details</p>
+                <a href="/customers" class="btn btn-primary">View Customers</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">Products</h5>
+                <p class="card-text">Manage product inventory and details</p>
+                <a href="/products" class="btn btn-primary">View Products</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <h5 class="card-title">Orders</h5>
+                <p class="card-text">Manage customer orders and tracking</p>
+                <a href="/orders" class="btn btn-primary">View Orders</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

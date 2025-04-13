@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Orders</h2>
+            
+            <!-- Orders Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h5>Order List</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Customer Name</th>
+                                    <th>Order Date</th>
+                                    <th>Status</th>
+                                    <th>Amount</th>
+                                    <th>Payment Method</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td>{{ order.Order_id }}</td>
+                                    <td>{{ order.Customer_name }}</td>
+                                    <td>{{ order.Order_date }}</td>
+                                    <td>
+                                        <span class="badge {% if order.Order_status == 'Pending' %}bg-warning{% elif order.Order_status == 'Processing' %}bg-info{% else %}bg-success{% endif %}">
+                                            {{ order.Order_status }}
+                                        </span>
+                                    </td>
+                                    <td>${{ "%.2f"|format(order.Total_amount|float) }}</td>
+                                    <td>{{ order.Payment_method }}</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('generate_bill', order_id=order.Order_id) }}" 
+                                               class="btn btn-primary btn-sm" 
+                                               target="_blank">
+                                                <i class="fas fa-file-invoice"></i> Generate Bill
+                                            </a>
+                                            {% if session.get('user_type') == 'customer' and order.Order_status == 'Completed' and not order.return_status %}
+                                            <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#returnModal{{ order.Order_id }}">
+                                                <i class="fas fa-undo"></i> Request Return
+                                            </button>
+                                            {% endif %}
+                                            {% if session.get('user_type') == 'employee' and order.return_status == 'Pending' %}
+                                            <form action="{{ url_for('process_return', order_id=order.Order_id, action='approve') }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to approve this return?')">
+                                                    <i class="fas fa-check"></i> Approve Return
+                                                </button>
+                                            </form>
+                                            <form action="{{ url_for('process_return', order_id=order.Order_id, action='reject') }}" method="POST" class="d-inline">
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to reject this return?')">
+                                                    <i class="fas fa-times"></i> Reject Return
+                                                </button>
+                                            </form>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                {% if session.get('user_type') == 'customer' %}
+                                <!-- Return Request Modal -->
+                                <div class="modal fade" id="returnModal{{ order.Order_id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Request Return for Order #{{ order.Order_id }}</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form action="{{ url_for('request_return', order_id=order.Order_id) }}" method="POST">
+                                                <div class="modal-body">
+                                                    <div class="mb-3">
+                                                        <label for="return_reason" class="form-label">Return Reason</label>
+                                                        <textarea class="form-control" id="return_reason" name="return_reason" rows="3" required></textarea>
+                                                    </div>
+                                                    {% if order.return_status %}
+                                                    <div class="mb-3">
+                                                        <label class="form-label">Return Status</label>
+                                                        <div>
+                                                            <span class="badge {% if order.return_status == 'Pending' %}bg-warning{% elif order.return_status == 'Approved' %}bg-success{% elif order.return_status == 'Rejected' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                                {{ order.return_status }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-warning">Submit Return Request</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add some custom styles -->
+<style>
+.card {
+    margin-bottom: 1.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+.badge {
+    padding: 0.5em 0.75em;
+}
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+.btn-group {
+    display: flex;
+    gap: 0.5rem;
+}
+</style>
+
+<!-- Initialize tooltips -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+    })
+});
+</script>
+{% endblock %} 

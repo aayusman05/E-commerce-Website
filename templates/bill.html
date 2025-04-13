@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bill - Order #{{ order.Order_id }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .bill-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .bill-info {
+            margin-bottom: 20px;
+        }
+        .bill-info div {
+            margin-bottom: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f5f5f5;
+        }
+        .total-row {
+            font-weight: bold;
+        }
+        .print-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+        @media print {
+            .print-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bill-header">
+        <h1>INVOICE</h1>
+        <h2>Order #{{ order.Order_id }}</h2>
+    </div>
+
+    <div class="bill-info">
+        <div><strong>Date:</strong> {{ date }}</div>
+        <div><strong>Customer Name:</strong> {{ order.Customer_name }}</div>
+        <div><strong>Email:</strong> {{ order.Customer_email }}</div>
+        <div><strong>Contact:</strong> {{ order.Customer_contact_no }}</div>
+        <div><strong>Shipping Address:</strong></div>
+        <div style="white-space: pre-line">{{ order.Shipping_address }}</div>
+        <div><strong>Payment Method:</strong> {{ order.Payment_method }}</div>
+        <div><strong>Order Status:</strong> {{ order.Order_status }}</div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order_items %}
+            <tr>
+                <td>{{ item.Product_name }}</td>
+                <td>{{ item.Quantity }}</td>
+                <td>${{ "%.2f"|format(item.Product_price|float) }}</td>
+                <td>${{ "%.2f"|format(item.Item_price|float) }}</td>
+            </tr>
+            {% endfor %}
+            <tr class="total-row">
+                <td colspan="3" style="text-align: right">Total Amount:</td>
+                <td>${{ "%.2f"|format(order.Total_amount|float) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="print-button">
+        <button onclick="window.print()">Print Bill</button>
+    </div>
+</body>
+</html> 

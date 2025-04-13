@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Our Products</h1>
+        {% if is_customer %}
+        <a href="{{ url_for('cart') }}" class="btn btn-primary">
+            <i class="fas fa-shopping-cart"></i> View Cart
+            {% if session.get('cart') %}
+            <span class="badge bg-danger">{{ session.cart|length }}</span>
+            {% endif %}
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100">
+                <img src="{{ url_for('static', filename='product_images/' + product.Product_image.split('/')[-1]) }}" 
+                     class="card-img-top" alt="{{ product.Product_name }}"
+                     style="height: 200px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.Product_name }}</h5>
+                    <p class="card-text">
+                        <strong>Color:</strong> {{ product.Product_colour }}<br>
+                        <strong>Price:</strong> ${{ "%.2f"|format(product.Product_price) }}<br>
+                        <strong>In Stock:</strong> {{ product.Product_qty }}
+                    </p>
+                    {% if is_customer %}
+                    <form action="{{ url_for('add_to_cart') }}" method="POST" class="d-flex align-items-center">
+                        <input type="hidden" name="product_id" value="{{ product.Product_id }}">
+                        <div class="input-group me-2" style="width: 120px;">
+                            <input type="number" name="quantity" class="form-control" value="1" min="1" max="{{ product.Product_qty }}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-cart-plus"></i> Add to Cart
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 
